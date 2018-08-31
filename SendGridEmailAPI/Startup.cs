@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SendGridEmailAPI.Services;
 
 namespace SendGridEmailAPI
 {
@@ -18,6 +19,9 @@ namespace SendGridEmailAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddSingleton<IEmailSendClient>(
+                x => new SendGridEmailClient(Configuration.GetValue<string>("APIKey")));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
