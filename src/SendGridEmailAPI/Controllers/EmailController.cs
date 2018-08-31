@@ -3,6 +3,7 @@ using SendGridEmailAPI.Model;
 using SendGridEmailAPI.Services;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SendGridEmailAPI.Controllers
@@ -41,14 +42,22 @@ namespace SendGridEmailAPI.Controllers
 
             try
             {
-                await _emailSender.SendEmailAsync(
+                HttpStatusCode emailStatus = await _emailSender.SendEmailAsync(
                     request.FromEmail, 
                     request.FromEmailName, 
                     request.ToEmail, 
                     request.EmailSubject,
                     request.EmailMessage);
 
-                return new JsonResult(new { result = "success" });
+                if (emailStatus != HttpStatusCode.Accepted)
+                {
+                    return new JsonResult(new { result = string.Format("Error during email transmission: {0}", emailStatus.ToString()) });
+                }
+                else
+                {
+                    return new JsonResult(new { result = "success" });
+                }
+                
             }
             catch (Exception ex)
             {

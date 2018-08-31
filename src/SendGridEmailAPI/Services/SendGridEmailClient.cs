@@ -1,5 +1,6 @@
 ﻿using SendGrid.Helpers.Mail;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SendGridEmailAPI.Services
@@ -13,7 +14,7 @@ namespace SendGridEmailAPI.Services
             _apiKey = apiKey;
         }
 
-        public Task SendEmailAsync(string fromEmail, string fromEmailName, string toEmail, string subject, string message)
+        public async Task<HttpStatusCode> SendEmailAsync(string fromEmail, string fromEmailName, string toEmail, string subject, string message)
         {
             var sendGridMessage = new SendGridMessage();
             sendGridMessage.AddTo(toEmail);
@@ -22,9 +23,9 @@ namespace SendGridEmailAPI.Services
             sendGridMessage.HtmlContent = message;
 
             SendGrid.ISendGridClient transportWeb = new SendGrid.SendGridClient(_apiKey);
-            transportWeb.SendEmailAsync(sendGridMessage);
+            SendGrid.Response emailTask = await transportWeb.SendEmailAsync(sendGridMessage);
 
-            return Task.CompletedTask;
+            return emailTask.StatusCode;
         }
     }
 }
